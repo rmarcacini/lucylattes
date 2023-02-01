@@ -20,6 +20,7 @@ from scraperlattes import getnomecompleto
 from scraperlattes import getcapit
 from scraperlattes import getlivro
 from scraperlattes import getperiod
+from scraperlattes import getevent
 from scraperlattes import getorient
 from scraperlattes import getprodtec
 from scraperlattes import getprojpesqext
@@ -59,6 +60,7 @@ for nid in range(len(df_idlist)):
     getprodtec(zipfilename)
     getorient(zipfilename)
     getperiod(zipfilename)
+    getevent(zipfilename)
     getlivro(zipfilename)
     getcapit(zipfilename)
     getnomecompleto(zipfilename)
@@ -70,20 +72,20 @@ getgrapho()
 
 # Gerar indicadores qualis ou nao
 # config_file = open('./config.txt', 'r')
-config_file = open('./config.txt', 'r', encoding='utf-8')
-run_indcapes = config_file.readlines()[7].split(':')[1]
-run_indcapes = run_indcapes.rstrip('\n')
-run_indcapes = run_indcapes.strip(' ')
-run_indcapes = int(run_indcapes)
-run_indcapes
-config_file.close()
-if run_indcapes == 1:
-    capes_indori()
-    capes_indprodart()
-    capes_indautdis()
-    capes_distindproddp()
-else:
-    print("Indicadores capes para PPG nao foram gerados")
+# config_file = open('./config.txt', 'r', encoding='utf-8')
+# run_indcapes = config_file.readlines()[7].split(':')[1]
+# run_indcapes = run_indcapes.rstrip('\n')
+# run_indcapes = run_indcapes.strip(' ')
+# run_indcapes = int(run_indcapes)
+# run_indcapes
+# config_file.close()
+# if run_indcapes == 1:
+#     capes_indori()
+#     capes_indprodart()
+#     capes_indautdis()
+#     capes_distindproddp()
+# else:
+#     print("Indicadores capes para PPG nao foram gerados")
 
-getrelatorio()
-removeCsvProducao()
+#getrelatorio()
+#removeCsvProducao()
