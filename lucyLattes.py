@@ -66,9 +66,9 @@ for nid in range(len(df_idlist)):
     getnomecompleto(zipfilename)
     getdiscip(zipfilename)
 
-gettidydf()
-getverificacao()
-getgrapho()
+# gettidydf()
+# getverificacao()
+# getgrapho()
 
 # Gerar indicadores qualis ou nao
 # config_file = open('./config.txt', 'r')
