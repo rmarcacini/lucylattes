@@ -414,6 +414,190 @@ def getorient(zipname):
                 df_advis['YEAR']), ' orientações')
 
 # ------------------------------------------------------------
+# Eventos
+# ------------------------------------------------------------
+    
+def getevent(zipname):
+    # lendo do zipfile
+    #zipname = '3272611282260295.zip'
+    zipfilepath = './xml_zip' + '/' + str(zipname)
+    archive = zipfile.ZipFile(zipfilepath, 'r')
+    lattesxmldata = archive.open('curriculo.xml')
+    soup = BeautifulSoup(lattesxmldata, 'lxml',
+                         from_encoding='ISO-8859-1')
+    # capturando nome completo para ordem de autoria
+    cv = soup.find_all('curriculo-vitae')
+    if len(cv) == 0:
+        print('curriculo vitae nao encontrado para', zipname)
+    else:
+        # listas para armazenamento de dados producao tecnica
+        for i in range(len(cv)):
+            dg = cv[i].find_all('dados-gerais')
+            # VERIFICANDO se ha dados gerais
+            if len(dg) == 0:
+                print('Dados gerais nao encontrados para', zipname)
+            else:
+                for j in range(len(dg)):
+                    # definindo nome completo
+                    gendata = str(dg[j])
+                    result = re.search('nome-completo=\"(.*)\" nome-em-citacoes',
+                                       gendata)
+                    cc = fun_result(result)
+                    fullname = cc
+    # ------------------------------------------------------------
+    # extrair todas as producoes bibliograficas
+    pb = soup.find_all('producao-bibliografica')
+    # VERIFICANDO se ha demais tipos de producao
+    if len(pb) == 0:
+        print('Producoes bibliograficas nao encontradas para', zipname)
+    else:
+        # Da producao bibliografica extrair o grupo de artigos publicados
+        artspubs = pb[0].find_all('trabalhos-em-eventos')
+        # VERIFICANDO se ha artigos publicados
+        if len(artspubs) == 0:
+            print('Trabalhos em eventos nao encontrados para', zipname)
+        else:
+            # listas para armazenamento de dados PERIODICOS
+            ls_per_title = []
+            ls_per_year = []
+            ls_per_doi = []
+            ls_per_lang = []
+            ls_per_journal = []
+            ls_per_natureza = []
+            ls_per_local = []
+            ls_per_issn = []
+            ls_per_qualis = []
+            ls_per_authors = []
+            ls_per_authororder = []
+            ls_per_orders = []
+            ls_jcr = []
+            ls_per_proceedings = []
+            # A partir do grupo de artigos publicados extrair os artigos
+            # publicados
+            artpub = artspubs[0].find_all('trabalho-em-eventos')
+            # a partir de cada artigo publicado extrair inf de interesse
+            for i in range(len(artpub)):
+                # dados basicos do paper
+                dba = artpub[i].find_all('dados-basicos-do-trabalho')
+                paperdb = str(dba)
+                # definindo o nome do paper
+                result = re.search('titulo-do-trabalho=\"(.*)\" titulo-do-trabalho-i',
+                                   paperdb)
+                cc = fun_result(result)
+                ls_per_title.append(cc)
+                # dados basicos do paper
+                dba = artpub[i].find_all('dados-basicos-do-trabalho')
+                paperdb = str(dba)
+                # definindo o nome do paper
+                result = re.search('natureza=\"(.*)\" pais-do-evento',
+                                   paperdb)
+                cc = fun_result(result)
+                ls_per_natureza.append(cc)
+                # print(cc)
+                # definindo ano do paper
+                result = re.search('ano-do-trabalho=\"(.*)\" doi',
+                                   paperdb)
+                cc = fun_result(result)
+                ls_per_year.append(cc)
+                # print(cc)
+                # definindo doi do paper
+                result = re.search('doi=\"(.*)\" flag-divulgacao-c',
+                                   paperdb)
+                cc = fun_result(result)
+                ls_per_doi.append(cc)
+                # print(cc)
+                # definindo idioma do paper
+                result = re.search('idioma=\"(.*)\" meio-de-divulgacao=',
+                                   paperdb)
+                cc = fun_result(result)
+                ls_per_lang.append(cc)
+                # print(cc)
+                # detalhamento do paper
+                dda = artpub[i].find_all('detalhamento-do-trabalho')
+                paperdt = str(dda)
+                # definindo titulo da conf
+                result = re.search('nome-do-evento=\"(.*)\" nome-do-evento-ingles',
+                                   paperdt)
+                cc = fun_result(result)
+                ls_per_journal.append(cc)
+
+                # detalhamento do paper
+                dda = artpub[i].find_all('detalhamento-do-trabalho')
+                paperdt = str(dda)
+                # definindo local (naciona / internaciona)
+                result = re.search('classificacao-do-evento=\"(.*)\" fasciculo',
+                                   paperdt)
+                cc = fun_result(result)
+                ls_per_local.append(cc)
+
+                # detalhamento do paper
+                dda = artpub[i].find_all('detalhamento-do-trabalho')
+                paperdt = str(dda)
+                # titulo dos anais
+                result = re.search('titulo-dos-anais-ou-proceedings=\"(.*)\" volume',
+                                   paperdt)
+                cc = fun_result(result)
+                ls_per_proceedings.append(cc)
+
+
+                # print(cc)
+                # definindo issn
+                ls_per_issn.append('VAZIO')
+                # print(cc)
+                # autores do paper
+                aut = artpub[i].find_all('autores')
+                ls_allauthors = []
+                ls_allauthororder = []
+                ls_authororder = []
+                for j in range(len(aut)):
+                    auth = str(aut[j])
+                    result = re.search(
+                        'nome-completo-do-autor=\"(.*)\" nome-para-citacao',
+                        auth)
+                    if result is None:
+                        cc = 'VAZIO'
+                    else:
+                        cc = result.group(1)
+                        nca = result.group(1)  # nomecompletoautor
+                    ls_allauthors.append(cc)
+                    # print(cc)
+                    # order de autoria
+                    result = re.search(
+                        'ordem-de-autoria=\"(.*)\"',
+                        auth)
+                    if result is None:
+                        cc = 'VAZIO'
+                    else:
+                        cc = result.group(1)
+                        ncao = result.group(1)
+                    ls_allauthororder.append(cc)
+                    if fullname == nca:
+                        ls_authororder.append(ncao)
+                        # print(fullname + ' ' + ncao)
+                    # print(cc)
+                ls_per_authors.append(ls_allauthors)
+                ls_per_authororder.append(ls_allauthororder)
+                ls_per_orders.append(ls_authororder)
+
+            # DataFrame periodicos
+            df_papers = pd.DataFrame({'TITLE': ls_per_title,
+                                      'YEAR': ls_per_year,
+                                      'DOI': ls_per_doi,
+                                      'LANG': ls_per_lang,
+                                      'CONF': ls_per_journal,
+                                      'NATUREZA': ls_per_natureza,
+                                      'PROCEEDINGS': ls_per_proceedings,
+                                      'LOCAL': ls_per_local,
+                                      'AUTHOR': ls_per_authors,
+                                      'ORDER': ls_per_authororder,
+                                      'ORDER_OK': ls_per_orders})
+            latid = zipname.split('.')[0]
+            pathfilename = str('./csv_producao/' + latid + '_event'  '.csv')
+            df_papers.to_csv(pathfilename, index=False)
+            print(pathfilename, ' gravado com', len(
+                df_papers['YEAR']), 'publicações em eventos')
+            
+# ------------------------------------------------------------
 # Periodicos
 # ------------------------------------------------------------
 
@@ -555,24 +739,7 @@ def getperiod(zipname):
                 ls_per_authors.append(ls_allauthors)
                 ls_per_authororder.append(ls_allauthororder)
                 ls_per_orders.append(ls_authororder)
-            # Qualis file
-            config_file = open('./config.txt', 'r')
-            # config_file = open('./config.txt', 'r', encoding='utf-8')
-            qf = config_file.readlines()[4].split(':')[1]
-            qf = qf.rstrip('\n')
-            qf = qf.strip(' ')
-            config_file.close()
-            df_qualis = pd.read_csv(qf,
-                                    header=0, sep='\t')
-            for k in range(len(ls_per_issn)):
-                result = df_qualis[df_qualis['ISSN']
-                                   == ls_per_issn[k]].reset_index(drop=True)
-                if len(result) == 0:
-                    cc = 'XX'
-                else:
-                    cc = result.iloc[0, 2]
-                ls_per_qualis.append(cc)
-                # print(cc)
+
             # JCR
             df_jcr = pd.read_csv('jcr_factor.csv', sep=',',
                                  header=0, dtype='str')
@@ -598,7 +765,6 @@ def getperiod(zipname):
                                       'DOI': ls_per_doi,
                                       'LANG': ls_per_lang,
                                       'JOURNAL': ls_per_journal,
-                                      'QUALIS': ls_per_qualis,
                                       'ISSN': ls_per_issn,
                                       'AUTHOR': ls_per_authors,
                                       'ORDER': ls_per_authororder,
@@ -1028,6 +1194,8 @@ def getnomecompleto(zipname):
               len(df_fullname['ID']), 'nomes completos')
 
 
+        
+        
 # ------------------------------------------------------------
 # Disciplinas ministradas
 # ------------------------------------------------------------
