@@ -1325,3 +1325,628 @@ def getdiscip(zipname):
         df_ens.to_csv(pathfilename, index=False)
         print(pathfilename, ' gravado com',
               len(df_ens['YEAR_FIN']), ' atividades de ensino')
+
+        
+def getpremiostitulos(zipname):
+    # lendo do zipfile
+    zipfilepath = './xml_zip' + '/' + str(zipname)
+    archive = zipfile.ZipFile(zipfilepath, 'r')
+    lattesxmldata = archive.open('curriculo.xml')
+    soup = BeautifulSoup(lattesxmldata, 'lxml',
+                         from_encoding='ISO-8859-1')
+
+    dtpt = soup.find_all('premios-titulos')
+    # VERIFICANDO se ha demais tipos de producao
+    if len(dtpt) == 0:
+        print('Sem premios e titulos para', zipname)
+    else:
+        # listas para armazenamento de dados producao tecnica
+        ls_premio_nome = []
+        ls_premio_entidade = []
+        ls_premio_ano = []
+        # A partir dos demais tipos de producao tecnica extrai-se os cursos,
+        # palestras, etc
+        for i in range(len(dtpt)):
+            ccdm = dtpt[i].find_all('premio-titulo')
+            # VERIFICANDO se ha cursos
+            if len(ccdm) == 0:
+                print('Sem premios e titulos para', zipname)
+            else:
+                for j in range(len(ccdm)):
+                    # definindo o nome do premio
+                    dado = str(ccdm[j])
+                    result = re.search('nome-do-premio-ou-titulo=\"(.*)\" nome',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_premio_nome.append(cc)
+                    # print(cc)
+                    # definindo a entidade do premio
+                    dado = str(ccdm[j])
+                    result = re.search('nome-da-entidade-promotora=\"(.*)\" nome-do-premio-ou-titulo=',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_premio_entidade.append(cc)
+                    # definindo o ano do premio
+                    dado = str(ccdm[j])
+                    result = re.search('ano-da-premiacao=\"(.*)\" nome-da-entidade-promotora=',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_premio_ano.append(cc)
+
+        # DataFrame 
+        df_ccd = pd.DataFrame({'NOME_PREMIO': ls_premio_nome,
+                               'ENTIDADE_PREMIO': ls_premio_entidade,
+                               'ANO_PREMIO': ls_premio_ano})
+        latid = zipname.split('.')[0]
+        pathfilename = str('./csv_producao/' + latid + '_premio_titulo'  '.csv')
+        df_ccd.to_csv(pathfilename, index=False)
+        print(pathfilename, ' gravado com', len(df_ccd), ' premios')
+        
+        
+        
+def getorganizacaoevento(zipname):
+    # lendo do zipfile
+    zipfilepath = './xml_zip' + '/' + str(zipname)
+    archive = zipfile.ZipFile(zipfilepath, 'r')
+    lattesxmldata = archive.open('curriculo.xml')
+    soup = BeautifulSoup(lattesxmldata, 'lxml',
+                         from_encoding='ISO-8859-1')
+
+    dtpt = soup.find_all('organizacao-de-evento')
+    # VERIFICANDO se ha demais tipos de producao
+    if len(dtpt) == 0:
+        print('Sem organizacao de eventos para', zipname)
+    else:
+        # listas para armazenamento de dados
+        ls_evento_tipo = []
+        ls_evento_natureza = []
+        ls_evento_titulo = []
+        ls_evento_titulo_ingles = []
+        ls_evento_ano = []
+        ls_evento_pais = []
+        ls_evento_idioma = []
+        ls_evento_promotora = []
+        ls_evento_local = []
+        ls_evento_cidade = []
+
+        # A partir dos demais tipos de producao tecnica extrai-se os cursos,
+        # palestras, etc
+        for i in range(len(dtpt)):
+            ccdm = dtpt[i].find_all('dados-basicos-da-organizacao-de-evento')
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem organizacao de eventos para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                    # tipo
+                    dado = str(ccdm[j])
+                    result = re.search('tipo=\"(.*)\" titulo=',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_evento_tipo.append(cc)
+
+                    # natureza
+                    dado = str(ccdm[j])
+                    result = re.search('natureza=\"(.*)\" pais=',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_evento_natureza.append(cc)
+
+
+                    # titulo
+                    dado = str(ccdm[j])
+                    result = re.search('titulo=\"(.*)\" titulo-ingles=',
+                                       dado)
+                    cc = fun_result(result)
+                    
+                    ls_evento_titulo.append(cc)
+
+                    # titulo_ingles
+                    dado = str(ccdm[j])
+                    result = re.search('titulo-ingles=\"(.*)\"',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc,'###',result)
+                    ls_evento_titulo_ingles.append(cc)
+
+                    # ano
+                    dado = str(ccdm[j])
+                    result = re.search('ano=\"(.*)\" doi=',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_evento_ano.append(cc)
+
+                    # pais
+                    dado = str(ccdm[j])
+                    result = re.search('pais=\"(.*)\" tipo=',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_evento_pais.append(cc)
+
+                    # idioma
+                    dado = str(ccdm[j])
+                    result = re.search('idioma=\"(.*)\" meio-de-divulgacao=',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_evento_idioma.append(cc)
+
+
+
+            ccdm = dtpt[i].find_all('detalhamento-da-organizacao-de-evento')
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem detalhamento??? organizacao de eventos para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                    # promotora
+                    dado = str(ccdm[j])
+                    result = re.search('instituicao-promotora=\"(.*)\" local=',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_evento_promotora.append(cc)
+
+                    # local
+                    dado = str(ccdm[j])
+                    result = re.search('local=\"(.*)\"',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_evento_local.append(cc)
+
+                    # cidade
+                    dado = str(ccdm[j])
+                    result = re.search('cidade=\"(.*)\" duracao-em-semanas=',
+                                       dado)
+                    cc = fun_result(result)
+                    ls_evento_cidade.append(cc)
+
+
+
+
+        # DataFrame 
+        df_ccd = pd.DataFrame({'EVENTO_TIPO': ls_evento_tipo,
+                               'EVENTO_NATUREZA': ls_evento_natureza,
+                               'EVENTO_TITULO': ls_evento_titulo,
+                               'EVENTO_TITULO_INGLES': ls_evento_titulo_ingles,
+                               'EVENTO_ANO': ls_evento_ano,
+                               'EVENTO_PAIS': ls_evento_pais,
+                               'EVENTO_IDIOMA': ls_evento_idioma,
+                               'EVENTO_INST_PROMOTORA': ls_evento_promotora,
+                               'EVENTO_LOCAL': ls_evento_local,
+                               'EVENTO_CIDADE': ls_evento_cidade})
+
+        latid = zipname.split('.')[0]
+        pathfilename = str('./csv_producao/' + latid + '_organiza_eventos'  '.csv')
+        df_ccd.to_csv(pathfilename, index=False)
+        print(pathfilename, ' gravado com', len(df_ccd), ' organizacao eventos')
+        
+        
+        
+def gettextojornalrevista(zipname):
+    # lendo do zipfile
+    zipfilepath = './xml_zip' + '/' + str(zipname)
+    archive = zipfile.ZipFile(zipfilepath, 'r')
+    lattesxmldata = archive.open('curriculo.xml')
+    soup = BeautifulSoup(lattesxmldata, 'lxml',
+                         from_encoding='ISO-8859-1')
+
+    tag_base = 'TEXTO-EM-JORNAL-OU-REVISTA'.lower()
+    dtpt = soup.find_all(tag_base)
+    # VERIFICANDO se ha demais tipos de producao
+    if len(dtpt) == 0:
+        print('Sem '+tag_base+' para', zipname)
+    else:
+        # listas para armazenamento de dados
+        ls_texto_jornal_titulo = []
+        ls_texto_jornal_natureza = []
+        ls_texto_jornal_ano = []
+        ls_texto_jornal_idioma = []
+        ls_texto_jornal_doi = []
+        ls_texto_jornal_revista = []
+
+
+        # A partir dos demais tipos de producao tecnica extrai-se os cursos,
+        # palestras, etc
+        for i in range(len(dtpt)):
+            ccdm = dtpt[i].find_all('dados-basicos-do-texto')
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem '+tag_base+' para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                    
+                    dado = str(ccdm[j])
+                    result = re.search('natureza=\"(.*)\" pais-de-publicacao=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_texto_jornal_natureza.append(cc)
+
+                    dado = str(ccdm[j])
+                    result = re.search('titulo-do-texto=\"(.*)\" ',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_texto_jornal_titulo.append(cc)
+
+                    
+                    dado = str(ccdm[j])
+                    result = re.search('ano-do-texto=\"(.*)\" doi=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_texto_jornal_ano.append(cc)
+
+
+                    
+                    dado = str(ccdm[j])
+                    result = re.search('idioma=\"(.*)\" meio-de-divulgacao=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_texto_jornal_idioma.append(cc)
+
+                    
+                    dado = str(ccdm[j])
+                    result = re.search('doi=\"(.*)\" flag-divulgacao-cientifica=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_texto_jornal_doi.append(cc)
+
+                    
+
+
+
+            ccdm = dtpt[i].find_all('detalhamento-do-texto')
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem detalhamento??? texto-jornal para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                    # promotora
+                    dado = str(ccdm[j])
+                    result = re.search('titulo-do-jornal-ou-revista=\"(.*)\" ',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_texto_jornal_revista.append(cc)
+
+
+
+
+        # DataFrame 
+
+        df_ccd = pd.DataFrame({'TEXTO_JORNAL_TITULO': ls_texto_jornal_titulo,
+                               'TEXTO_JORNAL_ANO': ls_texto_jornal_ano,
+                               'TEXTO_JORNAL_IDIOMA': ls_texto_jornal_idioma,
+                               'TEXTO_JORNAL_NATUREZA': ls_texto_jornal_natureza,
+                               'TEXTO_JORNAL_REVISTA': ls_texto_jornal_revista,
+                               'TEXTO_JORNAL_DOI': ls_texto_jornal_doi})
+
+        latid = zipname.split('.')[0]
+        pathfilename = str('./csv_producao/' + latid + '_texto_jornal'  '.csv')
+        df_ccd.to_csv(pathfilename, index=False)
+        print(pathfilename, ' gravado com', len(df_ccd), ' texto jornal')
+        
+        
+def getprogramaradiotv(zipname):
+    # lendo do zipfile
+    zipfilepath = './xml_zip' + '/' + str(zipname)
+    archive = zipfile.ZipFile(zipfilepath, 'r')
+    lattesxmldata = archive.open('curriculo.xml')
+    soup = BeautifulSoup(lattesxmldata, 'lxml',
+                         from_encoding='ISO-8859-1')
+
+    tag_base = 'PROGRAMA-DE-RADIO-OU-TV'.lower()
+    dtpt = soup.find_all(tag_base)
+    # VERIFICANDO se ha demais tipos de producao
+    if len(dtpt) == 0:
+        print('Sem '+tag_base+' para', zipname)
+    else:
+        # listas para armazenamento de dados
+        ls_natureza = []
+        ls_titulo = []
+        ls_ano = []
+        ls_idioma = []
+        ls_homepage = []
+        ls_emissora = []
+
+
+        # A partir dos demais tipos de producao tecnica extrai-se os cursos,
+        # palestras, etc
+        for i in range(len(dtpt)):
+            
+            ccdm = dtpt[i].find_all('DADOS-BASICOS-DO-PROGRAMA-DE-RADIO-OU-TV'.lower())
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem '+tag_base+' para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                    
+                    dado = str(ccdm[j])
+                    result = re.search('natureza=\"(.*)\" pais=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_natureza.append(cc)
+
+                    dado = str(ccdm[j])
+                    result = re.search('titulo=\"(.*)\" ',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_titulo.append(cc)
+
+                    
+                    dado = str(ccdm[j])
+                    result = re.search('ano=\"(.*)\" doi=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_ano.append(cc)
+
+
+                    
+                    dado = str(ccdm[j])
+                    result = re.search('idioma=\"(.*)\" meio-de-divulgacao=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_idioma.append(cc)
+
+                    
+                    dado = str(ccdm[j])
+                    result = re.search('home-page=\"(.*)\" idioma=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_homepage.append(cc)
+
+                    
+
+
+
+            ccdm = dtpt[i].find_all('DETALHAMENTO-DO-PROGRAMA-DE-RADIO-OU-TV'.lower())
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem detalhamento??? texto-jornal para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                    # promotora
+                    dado = str(ccdm[j])
+                    result = re.search('emissora=\"(.*)\" ',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_emissora.append(cc)
+
+
+
+
+        # DataFrame 
+        df_ccd = pd.DataFrame({'PROGRAMA_RADIO_TV_TITULO': ls_titulo,
+                               'PROGRAMA_RADIO_TV_NATUREZA': ls_natureza,
+                               'PROGRAMA_RADIO_TV_ANO': ls_ano,
+                               'PROGRAMA_RADIO_TV_IDIOMA': ls_idioma,
+                               'PROGRAMA_RADIO_TV_HOMEPAGE': ls_homepage,
+                               'PROGRAMA_RADIO_TV_EMISSORA': ls_emissora})
+
+        latid = zipname.split('.')[0]
+        pathfilename = str('./csv_producao/' + latid + '_programa_radio_tv'  '.csv')
+        df_ccd.to_csv(pathfilename, index=False)
+        print(pathfilename, ' gravado com', len(df_ccd), ' programa radio tv')
+        
+        
+        
+def getpatentes(zipname):
+    # lendo do zipfile
+    zipfilepath = './xml_zip' + '/' + str(zipname)
+    archive = zipfile.ZipFile(zipfilepath, 'r')
+    lattesxmldata = archive.open('curriculo.xml')
+    soup = BeautifulSoup(lattesxmldata, 'lxml',
+                         from_encoding='ISO-8859-1')
+
+    tag_base = 'PATENTE'.lower()
+    dtpt = soup.find_all(tag_base)
+    # VERIFICANDO se ha demais tipos de producao
+    if len(dtpt) == 0:
+        print('Sem '+tag_base+' para', zipname)
+    else:
+        # listas para armazenamento de dados
+        ls_tipo = []
+        ls_titulo = []
+        ls_ano = []
+        ls_codigo = []
+        ls_instituicao = []
+
+
+        # A partir dos demais tipos de producao tecnica extrai-se os cursos,
+        # palestras, etc
+        for i in range(len(dtpt)):
+            
+            ccdm = dtpt[i].find_all('DADOS-BASICOS-DA-PATENTE'.lower())
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem '+tag_base+' para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                  
+
+                    dado = str(ccdm[j])
+                    result = re.search('titulo=\"(.*)\" ',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_titulo.append(cc)
+
+                    
+                    dado = str(ccdm[j])
+                    result = re.search('ano-desenvolvimento=\"(.*)\" flag-potencial-inovacao=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_ano.append(cc)
+
+                    
+
+
+
+            ccdm = dtpt[i].find_all('REGISTRO-OU-PATENTE'.lower())
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem detalhamento??? patente para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                    dado = str(ccdm[j])
+                    result = re.search('tipo-patente=\"(.*)\" ',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_tipo.append(cc)
+
+                    dado = str(ccdm[j])
+                    result = re.search('codigo-do-registro-ou-patente=\"(.*)\" data-de-concessao=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_codigo.append(cc)
+
+                    dado = str(ccdm[j])
+                    result = re.search('instituicao-deposito-registro=\"(.*)\" nome-do-depositante=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_instituicao.append(cc)
+
+
+        # DataFrame 
+
+        df_ccd = pd.DataFrame({'PATENTE_TIPO': ls_tipo,
+                               'PATENTE_TITULO': ls_titulo,
+                               'PATENTE_ANO': ls_ano,
+                               'PATENTE_CODIGO': ls_codigo,
+                               'PATENTE_INSTITUICAO': ls_instituicao})
+
+        latid = zipname.split('.')[0]
+        pathfilename = str('./csv_producao/' + latid + '_patente'  '.csv')
+        df_ccd.to_csv(pathfilename, index=False)
+        print(pathfilename, ' gravado com', len(df_ccd), ' patente')
+
+        
+def getsoftware(zipname):
+    # lendo do zipfile
+    zipfilepath = './xml_zip' + '/' + str(zipname)
+    archive = zipfile.ZipFile(zipfilepath, 'r')
+    lattesxmldata = archive.open('curriculo.xml')
+    soup = BeautifulSoup(lattesxmldata, 'lxml',
+                         from_encoding='ISO-8859-1')
+
+    tag_base = 'SOFTWARE'.lower()
+    dtpt = soup.find_all(tag_base)
+    # VERIFICANDO se ha demais tipos de producao
+    if len(dtpt) == 0:
+        print('Sem '+tag_base+' para', zipname)
+    else:
+        # listas para armazenamento de dados
+        ls_finalidade = []
+        ls_titulo = []
+        ls_ano = []
+        ls_url = []
+        ls_plataforma = []
+        ls_ambiente = []
+        ls_instituicao = []
+
+
+        # A partir dos demais tipos de producao tecnica extrai-se os cursos,
+        # palestras, etc
+        for i in range(len(dtpt)):
+          
+                    
+
+
+
+            ccdm = dtpt[i].find_all('DADOS-BASICOS-DO-SOFTWARE'.lower())
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem detalhamento??? software para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                    dado = str(ccdm[j])
+                    result = re.search('titulo-do-software=\"(.*)\" ',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_titulo.append(cc)
+
+                    dado = str(ccdm[j])
+                    result = re.search('ano=\"(.*)\" doi=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_ano.append(cc)
+
+                    dado = str(ccdm[j])
+                    result = re.search('home-page-do-trabalho=\"(.*)\" idioma=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_url.append(cc)
+
+
+            ccdm = dtpt[i].find_all('DETALHAMENTO-DO-SOFTWARE'.lower())
+            # VERIFICANDO
+            if len(ccdm) == 0:
+                print('Sem detalhamento??? software para', zipname)
+            else:
+                for j in range(len(ccdm)):
+
+                    dado = str(ccdm[j])
+                    result = re.search('finalidade=\"(.*)\" finalidade-ingles=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_finalidade.append(cc)
+
+                    dado = str(ccdm[j])
+                    result = re.search('plataforma=\"(.*)\"',
+                                       dado)
+                    cc = fun_result(result).split('">')[0]
+                    #print(cc)
+                    ls_plataforma.append(cc)
+
+                    dado = str(ccdm[j])
+                    result = re.search('ambiente=\"(.*)\" disponibilidade=',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_ambiente.append(cc)
+
+                    dado = str(ccdm[j])
+                    result = re.search('instituicao-financiadora=\"(.*)\" ',
+                                       dado)
+                    cc = fun_result(result)
+                    #print(cc)
+                    ls_instituicao.append(cc)
+
+        # DataFrame 
+        df_ccd = pd.DataFrame({'SOFTWARE_TITULO': ls_titulo,
+                               'SOFTWARE_ANO': ls_ano,
+                               'SOFTWARE_FINALIDADE': ls_finalidade,
+                               'SOFTWARE_PLATAFORMA': ls_plataforma,
+                               'SOFTWARE_AMBIENTE': ls_ambiente,
+                               'SOFTWARE_INSTITUICAO_FINANCIADORA': ls_instituicao,
+                               'SOFTWARE_URL': ls_url})
+
+        latid = zipname.split('.')[0]
+        pathfilename = str('./csv_producao/' + latid + '_software'  '.csv')
+        df_ccd.to_csv(pathfilename, index=False)
+        print(pathfilename, ' gravado com', len(df_ccd), ' software')
