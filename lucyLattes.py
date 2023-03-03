@@ -25,6 +25,12 @@ from scraperlattes import getorient
 from scraperlattes import getprodtec
 from scraperlattes import getprojpesqext
 from scraperlattes import getdiscip
+from scraperlattes import getpremiostitulos
+from scraperlattes import getorganizacaoevento
+from scraperlattes import gettextojornalrevista
+from scraperlattes import getprogramaradiotv
+from scraperlattes import getpatentes
+from scraperlattes import getsoftware
 from readidlist import readIdList
 from index_capes import capes_indprodart
 from index_capes import capes_indori
@@ -65,7 +71,12 @@ for nid in range(len(df_idlist)):
     getcapit(zipfilename)
     getnomecompleto(zipfilename)
     getdiscip(zipfilename)
-
+    getpremiostitulos(zipfilename)
+    getorganizacaoevento(zipfilename)
+    gettextojornalrevista(zipfilename)
+    getprogramaradiotv(zipfilename)
+    getpatentes(zipfilename)
+    getsoftware(zipfilename)
 # gettidydf()
 # getverificacao()
 # getgrapho()
