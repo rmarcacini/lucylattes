@@ -31,6 +31,7 @@ from scraperlattes import gettextojornalrevista
 from scraperlattes import getprogramaradiotv
 from scraperlattes import getpatentes
 from scraperlattes import getsoftware
+from scraperlattes import getorientacoes
 from readidlist import readIdList
 from index_capes import capes_indprodart
 from index_capes import capes_indori
@@ -77,6 +78,7 @@ for nid in range(len(df_idlist)):
     getprogramaradiotv(zipfilename)
     getpatentes(zipfilename)
     getsoftware(zipfilename)
+    getorientacoes(zipfilename)
 # gettidydf()
 # getverificacao()
 # getgrapho()
