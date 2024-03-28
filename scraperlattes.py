@@ -1950,3 +1950,235 @@ def getsoftware(zipname):
         pathfilename = str('./csv_producao/' + latid + '_software'  '.csv')
         df_ccd.to_csv(pathfilename, index=False)
         print(pathfilename, ' gravado com', len(df_ccd), ' software')
+
+
+
+
+def getorientacoes(zipname):
+    # lendo do zipfile
+    # zipname = '3275865819287843.zip'
+    #zipname = '8190371175828378.zip'
+    # zipname = '5859946324646438.zip'    
+    zipfilepath = './xml_zip' + '/' + str(zipname)
+    archive = zipfile.ZipFile(zipfilepath, 'r')
+    lattesxmldata = archive.open('curriculo.xml')
+    soup = BeautifulSoup(lattesxmldata, 'lxml',
+                         from_encoding='ISO-8859-1')
+
+    # listas para armazenamento de dados
+    ls_natureza = []
+    ls_orientando = []
+    ls_ano = []
+    ls_tipo = []
+    ls_titulo = []
+    ls_instituicao = []
+    ls_bolsa = []
+    ls_curso = []
+    ls_status = []
+
+    tag_base = 'ORIENTACOES-CONCLUIDAS'.lower()
+    dtpt = soup.find_all(tag_base)
+
+    if len(dtpt) == 0:
+        print('Sem '+tag_base+' para', zipname)
+    else:
+
+        # 
+        for i in range(len(dtpt)):
+
+            tipos_orientacao = ['DADOS-BASICOS-DA-ORIENTACAO-EM-ANDAMENTO-DE-INICIACAO-CIENTIFICA',
+              'DADOS-BASICOS-DA-ORIENTACAO-EM-ANDAMENTO-DE-MESTRADO',
+              'DADOS-BASICOS-DA-ORIENTACAO-EM-ANDAMENTO-DE-DOUTORADO',
+              'DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO',
+              'DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO',
+              'DADOS-BASICOS-DE-OUTRAS-ORIENTACOES-CONCLUIDAS']
+
+            for t in tipos_orientacao:
+
+                ccdm = dtpt[i].find_all(t.lower())
+                # VERIFICANDO
+                if len(ccdm) == 0:
+                    print('Sem detalhamento??? orientacoes para', zipname)
+                else:
+                    for j in range(len(ccdm)):
+
+                        ls_status.append(t)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('natureza=\"(.*)\" pais',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_natureza.append(cc)
+
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('nome-do-orientando=\"(.*)\" ',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_orientando.append(cc)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('ano=\"(.*)\" doi=',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_ano.append(cc)
+
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('tipo=\"(.*)\" titulo=',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_tipo.append(cc)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('titulo=\"(.*)\" ',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_titulo.append(cc)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('nome-instituicao=\"(.*)\" ',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_instituicao.append(cc)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('nome-curso=\"(.*)\" ',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_curso.append(cc)
+
+#####################################
+
+
+    tag_base = 'ORIENTACOES-EM-ANDAMENTO'.lower()
+    dtpt = soup.find_all(tag_base)
+
+    if len(dtpt) == 0:
+        print('Sem '+tag_base+' para', zipname)
+    else:
+
+        # 
+        for i in range(len(dtpt)):
+
+            tipos_orientacao = ['DADOS-BASICOS-DA-ORIENTACAO-EM-ANDAMENTO-DE-INICIACAO-CIENTIFICA',
+              'DADOS-BASICOS-DA-ORIENTACAO-EM-ANDAMENTO-DE-MESTRADO',
+              'DADOS-BASICOS-DA-ORIENTACAO-EM-ANDAMENTO-DE-DOUTORADO',
+              'DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO',
+              'DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO',
+              'DADOS-BASICOS-DE-OUTRAS-ORIENTACOES-CONCLUIDAS']
+
+            for t in tipos_orientacao:
+
+                ccdm = dtpt[i].find_all(t.lower())
+                # VERIFICANDO
+                if len(ccdm) == 0:
+                    print('Sem detalhamento??? orientacoes para', zipname)
+                else:
+                    for j in range(len(ccdm)):
+
+                        ls_status.append(t)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('natureza=\"(.*)\" pais',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_natureza.append(cc)
+
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('nome-do-orientando=\"(.*)\" ',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_orientando.append(cc)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('ano=\"(.*)\" doi=',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_ano.append(cc)
+
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('tipo=\"(.*)\" titulo=',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_tipo.append(cc)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('titulo=\"(.*)\" ',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_titulo.append(cc)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('nome-instituicao=\"(.*)\" ',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_instituicao.append(cc)
+
+                        ################
+
+                        dado = str(ccdm[j])
+                        result = re.search('nome-curso=\"(.*)\" ',
+                                           dado)
+                        cc = fun_result(result)
+                        #print(cc)
+                        ls_curso.append(cc)
+
+
+#####################################
+
+        # DataFrame 
+        df_ccd = pd.DataFrame({'ORIENTACAO_NATUREZA': ls_natureza,
+                               'ORIENTACAO_ORIENTANDO': ls_orientando,
+                               'ORIENTACAO_ANO': ls_ano,
+                               'ORIENTACAO_TIPO': ls_tipo,
+                               'ORIENTACAO_TITULO': ls_titulo,
+                               'ORIENTACAO_INSTITUICAO': ls_instituicao,
+                               'ORIENTACAO_CURSO': ls_curso,
+                               'ORIENTACAO_STATUS': ls_status})
+
+        latid = zipname.split('.')[0]
+        pathfilename = str('./csv_producao/' + latid + '_orientacao'  '.csv')
+        df_ccd.to_csv(pathfilename, index=False)
+        print(pathfilename, ' gravado com', len(df_ccd), ' orientacao')
